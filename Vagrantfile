@@ -1,6 +1,10 @@
-Vagrant.configure("2") do |config|
-  NODES = 3
+require 'yaml'
 
+current_dir    = File.dirname(File.expand_path(__FILE__))
+configs        = YAML.load_file("#{current_dir}/config.yml")
+vagrant_config = configs['configs']
+
+Vagrant.configure("2") do |config|
   config.vbguest.auto_update = false
   config.vm.box_check_update = false
   config.vm.box = "Dougs71/CentOS-7.6.1810-Minimal"
@@ -22,7 +26,7 @@ Vagrant.configure("2") do |config|
     control.vm.provision "shell", path: "provision/control.sh", privileged: false
   end
 
-  (1..NODES).each do |node_id|
+  (1..vagrant_config['nodes']).each do |node_id|
     config.vm.define "node#{node_id}" do |node|
       node.vm.box = "Dougs71/CentOS-7.6.1810-Minimal"
       node.vm.hostname = "node#{node_id}"
